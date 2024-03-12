@@ -67,7 +67,7 @@ def main(args):
 
     if args.device == "cuda" and torch.cuda.is_available():
         print("Using CUDA\n")
-        args.device = torch.device("cuda:0")
+        # args.device = torch.device("cuda:2")
         # torch.cuda.manual_seed_all(args.seed)
         torch.cuda.manual_seed(args.seed)
         torch.backends.cudnn.deterministic = True
@@ -80,22 +80,25 @@ def main(args):
     # Load and preprocess data for model
     #########################
 
-    data_path = "data/stock.csv"
+    data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_full.csv"
     X, T, _, args.max_seq_len, args.padding_value = data_preprocess(
         data_path, args.max_seq_len
     )
+    #这边args.max_seq_len好像没必要再输出一遍，data_preprocess中args.max_seq_len并没有什么变化
 
     print(f"Processed data: {X.shape} (Idx x MaxSeqLen x Features)\n")
-    print(f"Original data preview:\n{X[:2, :10, :2]}\n")
+    print(f"Original data preview:\n{X[:4, :20, :10]}\n")
 
     args.feature_dim = X.shape[-1]
     args.Z_dim = X.shape[-1]
+    #这两个是同一个东西？Z是Z-score？
 
     # Train-Test Split data and time
     train_data, test_data, train_time, test_time = train_test_split(
         X, T, test_size=args.train_rate, random_state=args.seed
     )
-
+    # train_rate=0.5(defaulted)
+    
     #########################
     # Initialize and Run model
     #########################
@@ -112,7 +115,7 @@ def main(args):
     # Log end time
     end = time.time()
 
-    print(f"Generated data preview:\n{generated_data[:2, -10:, :2]}\n")
+    print(f"Generated data preview:\n{generated_data[:4, -20:, :10]}\n")
     print(f"Model Runtime: {(end - start)/60} mins\n")
 
     #########################

@@ -34,7 +34,7 @@ def data_preprocess(
     max_seq_len: int, 
     padding_value: float=-1.0,
     impute_method: str="mode", 
-    scaling_method: str="minmax", 
+    scaling_method: str="standard", 
 ) -> Tuple[np.ndarray, np.ndarray, List]:
     """Load the data and preprocess into 3d numpy array.
     Preprocessing includes:
@@ -60,7 +60,7 @@ def data_preprocess(
     # Load data
     #########################
 
-    index = 'Idx'
+    index = 'caseID'
 
     # Load csv
     print("Loading data...\n")
@@ -73,10 +73,11 @@ def data_preprocess(
     #########################
     # Remove outliers from dataset
     #########################
-    
     no = ori_data.shape[0]
     z_scores = stats.zscore(ori_data, axis=0, nan_policy='omit')
+    #Z-score是怎么算的，滤去的都是什么样的数据，我的testcases也需要滤去吗？
     z_filter = np.nanmax(np.abs(z_scores), axis=1) < 3
+    #保留那些在每个特征上的Z-score绝对值都小于3的样本。
     ori_data = ori_data[z_filter]
     print(f"Dropped {no - ori_data.shape[0]} rows (outliers)\n")
 
@@ -113,9 +114,11 @@ def data_preprocess(
     #     print(f"Padding value `{padding_value}` found in data")
     #     padding_value = np.nanmin(ori_data.to_numpy()) - 1
     #     print(f"Changed padding value to: {padding_value}\n")
+    # padding填充值是用于使序列具有相同长度的特殊值，以便在神经网络中进行处理，没有实际数值
     
     # Output initialization
     output = np.empty([no, max_seq_len, dim])  # Shape:[no, max_seq_len, dim]
+    # preprocessed data
     output.fill(padding_value)
     time = []
 
@@ -141,9 +144,12 @@ def data_preprocess(
         else:
             output[i, :curr_no, :] = curr_data[:, 1:]  # Shape: [1, max_seq_len, dim]
             time.append(curr_no)
+        #修剪或填充至max_seq_len
 
     return output, time, params, max_seq_len, padding_value
 
+
+#这个其实我的testcases应该用不到，因为我没有missing value吧
 def imputer(
     curr_data: np.ndarray, 
     impute_vals: List, 

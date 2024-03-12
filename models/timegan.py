@@ -21,6 +21,7 @@ class EmbeddingNetwork(torch.nn.Module):
             batch_first=True
         )
         self.emb_linear = torch.nn.Linear(self.hidden_dim, self.hidden_dim)
+        #self.emb_linear = torch.nn.Linear(self.feature_dim, self.hidden_dim)?
         self.emb_sigmoid = torch.nn.Sigmoid()
 
         # Init weights

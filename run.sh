@@ -6,11 +6,11 @@ export TZ="GMT-8"
 exp="test"
 
 # Iteration variables
-emb_epochs=50
-sup_epochs=50
-gan_epochs=50
+emb_epochs=300
+sup_epochs=300
+gan_epochs=300
 
-python main.py \
+CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python main.py \
 --device            cuda \
 --exp               $exp \
 --is_train          $train \
@@ -27,3 +27,4 @@ python main.py \
 --dis_thresh        0.15 \
 --optimizer         adam \
 --learning_rate     1e-3 \
+>> /home/rzhou/Projects/GAN/timegan-pytorch/log/inD_multi-epoch300_standardscaling.log 2>&1 &

@@ -174,7 +174,7 @@ def joint_trainer(
 def timegan_trainer(model, data, time, args):
     """The training procedure for TimeGAN
     Args:
-        - model (torch.nn.module): The model model that generates synthetic data
+        - model (torch.nn.module): The model that generates synthetic data
         - data (numpy.ndarray): The data for training the model
         - time (numpy.ndarray): The time for the model to be conditioned on
         - args (dict): The model/training configurations
