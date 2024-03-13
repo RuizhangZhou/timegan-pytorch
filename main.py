@@ -174,6 +174,12 @@ def main(args):
     print('Feature prediction results:\n' +
           f'(1) Ori: {str(np.round(ori_feat_pred_perf, 4))}\n' +
           f'(2) New: {str(np.round(new_feat_pred_perf, 4))}\n')
+    '''
+    这段代码的核心功能是使用其他特征来预测某个特定特征。这在时间序列数据分析中是一个常见的任务，尤其是在特征工程和数据预处理阶段。这个过程分别对原始数据集 (train_data, test_data) 和生成数据集 (generated_data, generated_time) 进行了特征预测任务，最后比较了这两种数据在特征预测任务上的性能。
+    在这个上下文中，ori_feat_pred_perf 和 new_feat_pred_perf 分别代表：
+    ori_feat_pred_perf: 使用原始数据进行特征预测时的性能指标列表。每个元素代表对一个特定特征预测任务的性能，这里使用的是均方根误差（Root Mean Square Error, RMSE）作为性能指标。这个列表中的值越小，表示原始数据用于预测该特征的性能越好。
+    new_feat_pred_perf: 使用生成数据进行特征预测时的性能指标列表。同样，列表中的每个元素表示使用生成数据对一个特定特征进行预测的RMSE。这里的值同样是越小越好，表示生成数据用于预测该特征的准确性越高。
+    最后的输出部分打印了这两个列表的内容，并通过np.round函数四舍五入到四位小数，以便于比较和阅读。输出的目的是让你可以直观地看到使用原始数据和生成数据对特征进行预测时的性能差异，这对于评估生成模型的质量和实用性非常有帮助。如果生成数据的预测性能接近原始数据，这可能表明生成模型能够捕捉到原始数据的关键统计特性，因此生成的数据在某种程度上是“真实的”或至少是有用的。'''
 
     # 2. One step ahead prediction
     print("Running one step ahead prediction using original data...")
