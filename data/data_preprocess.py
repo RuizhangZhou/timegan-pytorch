@@ -32,9 +32,9 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 def data_preprocess(
     file_name: str, 
     max_seq_len: int, 
-    padding_value: float=-1.0,
+    padding_value: float=-10.0,
     impute_method: str="mode", 
-    scaling_method: str="standard", 
+    scaling_method: str="minmax", 
 ) -> Tuple[np.ndarray, np.ndarray, List]:
     """Load the data and preprocess into 3d numpy array.
     Preprocessing includes:
@@ -61,6 +61,7 @@ def data_preprocess(
     #########################
 
     index = 'caseID'
+    #index='trackID'
 
     # Load csv
     print("Loading data...\n")
@@ -78,8 +79,8 @@ def data_preprocess(
     #Z-score是怎么算的，滤去的都是什么样的数据，我的testcases也需要滤去吗？
     z_filter = np.nanmax(np.abs(z_scores), axis=1) < 3
     #保留那些在每个特征上的Z-score绝对值都小于3的样本。
-    ori_data = ori_data[z_filter]
-    print(f"Dropped {no - ori_data.shape[0]} rows (outliers)\n")
+    #ori_data = ori_data[z_filter]
+    #print(f"Dropped {no - ori_data.shape[0]} rows (outliers)\n")
 
     # Parameters
     uniq_id = np.unique(ori_data[index])
