@@ -3,12 +3,12 @@ train=true
 export TZ="GMT-8"
 
 # Experiment variables
-exp="inD_multi_test"
+exp="inD_multi_Epoch4000_without_zfilter_min_G_Loss"
 
 # Iteration variables
-emb_epochs=20
-sup_epochs=20
-gan_epochs=20
+emb_epochs=10000
+sup_epochs=10000
+gan_epochs=4000
 
 CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python main.py \
 --device            cuda \
@@ -27,4 +27,4 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 nohup python main.py \
 --dis_thresh        0.15 \
 --optimizer         adam \
 --learning_rate     1e-3 \
->> /home/rzhou/Projects/scenariogenerationai/timegan-pytorch/log/inD_multi-test.log 2>&1 &
+>> /home/rzhou/Projects/timegan-pytorch/log/inD_multi_Epoch4000_without_zfilter_min_G_Loss.log 2>&1 &

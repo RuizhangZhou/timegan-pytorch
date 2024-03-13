@@ -106,6 +106,9 @@ def joint_trainer(
         desc=f"Epoch: 0, E_loss: 0, G_loss: 0, D_loss: 0"
     )
     
+    min_G_loss = np.inf
+    min_G_loss_model=model
+    min_G_loss_epoch=0
     for epoch in logger:
         for X_mb, T_mb in dataloader:
             ## Generator Training
@@ -149,7 +152,13 @@ def joint_trainer(
                 # Update model parameters
                 d_opt.step()
             D_loss = D_loss.item()
-
+            
+        if G_loss < min_G_loss:
+            min_G_loss = G_loss  # 更新最小G_loss
+            # 保存模型
+            min_G_loss_model=model
+            min_G_loss_epoch=epoch
+        
         logger.set_description(
             f"Epoch: {epoch}, E: {E_loss:.4f}, G: {G_loss:.4f}, D: {D_loss:.4f}"
         )
@@ -171,6 +180,10 @@ def joint_trainer(
             )
             writer.flush()
 
+    torch.save(min_G_loss_model.state_dict(), f"{args.model_path}/min_G_loss_model.pt")
+    print(f"Epoch {min_G_loss_epoch}: minimum G_loss {min_G_loss:.4f} - min_G_loss_model saved")
+    
+    
 def timegan_trainer(model, data, time, args):
     """The training procedure for TimeGAN
     Args:
@@ -257,7 +270,7 @@ def timegan_generator(model, T, args):
     with open(f"{args.model_path}/args.pickle", "rb") as fb:
         args = torch.load(fb)
     
-    model.load_state_dict(torch.load(f"{args.model_path}/model.pt"))
+    model.load_state_dict(torch.load(f"{args.model_path}/min_G_loss_model.pt"))
     
     print("\nGenerating Data...")
     # Initialize model to evaluation mode and run without gradients
