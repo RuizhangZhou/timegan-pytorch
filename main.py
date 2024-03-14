@@ -80,10 +80,14 @@ def main(args):
     # Load and preprocess data for model
     #########################
 
-    data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_full.csv"
-    X, T, _, args.max_seq_len, args.padding_value = data_preprocess(
-        data_path, args.max_seq_len
+    #data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_full.csv"
+    data_path = "/DATA1/rzhou/ika/singe_cases/inD_single.csv"
+    X, T, params_rescale, args.max_seq_len, args.padding_value = data_preprocess(
+        file_name=data_path, max_seq_len=args.max_seq_len,scaling_method=args.scaling_method
     )
+    #padding_value: float=-10.0,
+    #impute_method: str="mode", 
+    #scaling_method: str="minmax",
     #这边args.max_seq_len好像没必要再输出一遍，data_preprocess中args.max_seq_len并没有什么变化
 
     print(f"Processed data: {X.shape} (Idx x MaxSeqLen x Features)\n")
@@ -110,12 +114,37 @@ def main(args):
     if args.is_train == True:
         timegan_trainer(model, train_data, train_time, args)
     generated_data = timegan_generator(model, train_time, args)
+    
+    params_rescale=params_rescale[1:]
+    if args.scaling_method=="minmax":
+        data_min_ = params[0]  # 这里是最小值数组
+        data_max_ = params[1]  # 这里是最大值数组大值数组
+        rescaled_generated_data = np.empty_like(generated_data)
+        for feature_idx in range(generated_data.shape[-1]):
+            # 对每个特征单独处理
+            min_val = data_min_[feature_idx]
+            max_val = data_max_[feature_idx]
+            # MinMaxScaler 的逆变换公式
+            rescaled_generated_data[..., feature_idx] = generated_data[..., feature_idx] * (max_val - min_val) + min_val
+    else:
+        mean_ = params[0]  # 这里是平均值数组
+        scale_ = params[1]  # 这里是标准差数组
+        # 重新缩放数据
+        rescaled_generated_data = np.empty_like(generated_data)
+        for feature_idx in range(generated_data.shape[-1]):
+            # 对每个特征单独处理
+            mean_val = mean_[feature_idx]
+            scale_val = scale_[feature_idx]
+            # StandardScaler 的逆变换公式
+            rescaled_generated_data[..., feature_idx] = generated_data[..., feature_idx] * scale_val + mean_val
+        
     generated_time = train_time
 
     # Log end time
     end = time.time()
 
-    print(f"Generated data preview:\n{generated_data[:4, -20:, :10]}\n")
+    print(f"Generated data preview:\n{generated_data[:4, -20:, ]}\n")
+    print(f"Rescaled generated data preview:\n{rescaled_generated_data[:4, -20:, ]}\n")
     print(f"Model Runtime: {(end - start)/60} mins\n")
 
     #########################
@@ -249,6 +278,11 @@ if __name__ == "__main__":
         '--train_rate',
         default=0.5,
         type=float)
+    parser.add_argument(
+        '--scaling_method',
+        choices=['minmax', 'standard'],
+        default="minmax",
+        type=str)
 
     # Model Arguments
     parser.add_argument(
