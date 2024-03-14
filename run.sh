@@ -3,12 +3,12 @@ train=true
 export TZ="GMT-8"
 
 # Experiment variables
-exp="inD_single_Epoch500_without_zfilter_min_G_Loss"
+exp="inD(18-29)_multi_Epoch10000_withoutZfilter_min_G_Loss"
 
 # Iteration variables
-emb_epochs=1000
-sup_epochs=1000
-gan_epochs=1000
+emb_epochs=10000
+sup_epochs=10000
+gan_epochs=10000
 
 CUDA_VISIBLE_DEVICES=2,1,0 nohup python main.py \
 --device            cuda \
@@ -28,4 +28,4 @@ CUDA_VISIBLE_DEVICES=2,1,0 nohup python main.py \
 --dis_thresh        0.15 \
 --optimizer         adam \
 --learning_rate     1e-3 \
->> /home/rzhou/Projects/timegan-pytorch/log/inD_single_Epoch500_without_zfilter_min_G_Loss.log 2>&1 &
+>> /home/rzhou/Projects/timegan-pytorch/log/inD(18-29)_multi_Epoch10000_withoutZfilter_min_G_Loss.log 2>&1 &
