@@ -106,6 +106,13 @@ def joint_trainer(
         desc=f"Epoch: 0, E_loss: 0, G_loss: 0, D_loss: 0"
     )
     
+    # 初始化最小G_loss记录变量
+    min_G_loss_periodic = np.inf
+    min_G_loss_periodic_model = None
+    min_G_loss_periodic_epoch = 0
+    periodic_epoch_interval = 1000  # 每1000个epoch保存一次
+    min_G_losses_periodic = []  # 记录每1000个epoch周期内的最小G_loss及其epoch
+    
     min_G_loss = np.inf
     min_G_loss_model=model
     min_G_loss_epoch=0
@@ -152,6 +159,25 @@ def joint_trainer(
                 # Update model parameters
                 d_opt.step()
             D_loss = D_loss.item()
+            
+        if G_loss < min_G_loss_periodic:
+            min_G_loss_periodic = G_loss
+            min_G_loss_periodic_model = model.state_dict()
+            min_G_loss_periodic_epoch = epoch
+
+        # 每1000个epoch结束时执行操作
+        if (epoch + 1) % periodic_epoch_interval == 0:
+            # 保存周期内最小G_loss的模型状态
+            torch.save(min_G_loss_periodic_model, f"{args.model_path}/min_G_loss_model_epoch_{epoch+1}.pt")
+            print(f"Epoch {min_G_loss_periodic_epoch + 1}: Periodic minimum G_loss {min_G_loss_periodic:.4f} - Model saved")
+
+            # 记录周期内最小G_loss及其epoch
+            min_G_losses_periodic.append((min_G_loss_periodic, min_G_loss_periodic_epoch + 1))
+
+            # 重置周期内最小G_loss的跟踪变量
+            min_G_loss_periodic = np.inf
+            min_G_loss_periodic_model = None
+            min_G_loss_periodic_epoch = 0
             
         if G_loss < min_G_loss:
             min_G_loss = G_loss  # 更新最小G_loss
