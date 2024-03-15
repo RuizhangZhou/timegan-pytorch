@@ -115,10 +115,10 @@ def main(args):
         timegan_trainer(model, train_data, train_time, args)
     generated_data = timegan_generator(model, train_time, args)
     
-    params_rescale=params_rescale[1:]
+    cut_params_rescale=[arr[1:] for arr in params_rescale]
     if args.scaling_method=="minmax":
-        data_min_ = params[0]  # 这里是最小值数组
-        data_max_ = params[1]  # 这里是最大值数组大值数组
+        data_min_ = cut_params_rescale[0]  # 这里是最小值数组
+        data_max_ = cut_params_rescale[1]  # 这里是最大值数组大值数组
         rescaled_generated_data = np.empty_like(generated_data)
         for feature_idx in range(generated_data.shape[-1]):
             # 对每个特征单独处理
@@ -127,8 +127,8 @@ def main(args):
             # MinMaxScaler 的逆变换公式
             rescaled_generated_data[..., feature_idx] = generated_data[..., feature_idx] * (max_val - min_val) + min_val
     else:
-        mean_ = params[0]  # 这里是平均值数组
-        scale_ = params[1]  # 这里是标准差数组
+        mean_ = cut_params_rescale[0]  # 这里是平均值数组
+        scale_ = cut_params_rescale[1]  # 这里是标准差数组
         # 重新缩放数据
         rescaled_generated_data = np.empty_like(generated_data)
         for feature_idx in range(generated_data.shape[-1]):
@@ -162,6 +162,8 @@ def main(args):
         pickle.dump(test_time, fb)
     with open(f"{args.model_path}/fake_data.pickle", "wb") as fb:
         pickle.dump(generated_data, fb)
+    with open(f"{args.model_path}/rescaled_fake_data.pickle", "wb") as fb:
+        pickle.dump(rescaled_generated_data, fb)
     with open(f"{args.model_path}/fake_time.pickle", "wb") as fb:
         pickle.dump(generated_time, fb)
 
