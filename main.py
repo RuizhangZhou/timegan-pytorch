@@ -21,7 +21,7 @@ from metrics.metric_utils import (
 )
 
 from models.timegan import TimeGAN
-from models.utils import timegan_trainer, timegan_generator
+from models.utils import timegan_trainer, timegan_generator, rescale
 
 def main(args):
     ##############################################
@@ -80,8 +80,8 @@ def main(args):
     # Load and preprocess data for model
     #########################
 
-    #data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_full.csv"
-    data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_18-29.csv"
+    data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_full.csv"
+    #data_path = "/DATA1/rzhou/ika/multi_testcases/inD_multi_18-29.csv"
     X, T, params_rescale, args.max_seq_len, args.padding_value = data_preprocess(
         file_name=data_path, max_seq_len=args.max_seq_len,scaling_method=args.scaling_method
     )
@@ -114,37 +114,14 @@ def main(args):
     if args.is_train == True:
         timegan_trainer(model, train_data, train_time, args)
     generated_data = timegan_generator(model, train_time, args)
-    
-    cut_params_rescale=[arr[1:] for arr in params_rescale]
-    if args.scaling_method=="minmax":
-        data_min_ = cut_params_rescale[0]  # 这里是最小值数组
-        data_max_ = cut_params_rescale[1]  # 这里是最大值数组大值数组
-        rescaled_generated_data = np.empty_like(generated_data)
-        for feature_idx in range(generated_data.shape[-1]):
-            # 对每个特征单独处理
-            min_val = data_min_[feature_idx]
-            max_val = data_max_[feature_idx]
-            # MinMaxScaler 的逆变换公式
-            rescaled_generated_data[..., feature_idx] = generated_data[..., feature_idx] * (max_val - min_val) + min_val
-    else:
-        mean_ = cut_params_rescale[0]  # 这里是平均值数组
-        scale_ = cut_params_rescale[1]  # 这里是标准差数组
-        # 重新缩放数据
-        rescaled_generated_data = np.empty_like(generated_data)
-        for feature_idx in range(generated_data.shape[-1]):
-            # 对每个特征单独处理
-            mean_val = mean_[feature_idx]
-            scale_val = scale_[feature_idx]
-            # StandardScaler 的逆变换公式
-            rescaled_generated_data[..., feature_idx] = generated_data[..., feature_idx] * scale_val + mean_val
-        
+    rescaled_generated_data=rescale(generated_data,args.scaling_method,params_rescale)
     generated_time = train_time
 
     # Log end time
     end = time.time()
 
-    print(f"Generated data preview:\n{generated_data[:4, -20:, ]}\n")
-    print(f"Rescaled generated data preview:\n{rescaled_generated_data[:4, -20:, ]}\n")
+    print(f"Generated data preview:\n{generated_data[:2, -10:, ]}\n")
+    print(f"Rescaled generated data preview:\n{rescaled_generated_data[:2, -10:, ]}\n")
     print(f"Model Runtime: {(end - start)/60} mins\n")
 
     #########################

@@ -3,7 +3,7 @@ train=true
 export TZ="GMT-8"
 
 # Experiment variables
-exp="inD_18-29_multi_Epoch5000_withoutZfilter_min_G_Loss_period1000epoch"
+exp="inD_multi_Epoch5000_withoutZfilter_min_G_Loss_period1000epoch"
 
 # Iteration variables
 emb_epochs=5000
@@ -28,4 +28,4 @@ CUDA_VISIBLE_DEVICES=1,2,0 nohup python main.py \
 --dis_thresh        0.15 \
 --optimizer         adam \
 --learning_rate     1e-3 \
->> /home/rzhou/Projects/timegan-pytorch/log/inD_18-29_multi_Epoch5000_withoutZfilter_min_G_Loss_period1000epoch.log 2>&1 &
+>> /home/rzhou/Projects/timegan-pytorch/log/inD_multi_Epoch5000_withoutZfilter_min_G_Loss_period1000epoch.log 2>&1 &
