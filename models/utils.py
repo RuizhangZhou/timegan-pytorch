@@ -331,7 +331,7 @@ def rescale(generated_data,scaling_method,params_rescale):
             max_val = data_max_[feature_idx]
             # MinMaxScaler 的逆变换公式
             rescaled_generated_data[..., feature_idx] = generated_data[..., feature_idx] * (max_val - min_val) + min_val
-    else if scaling_method=="standard":
+    elif scaling_method=="standard":
         mean_ = cut_params_rescale[0]  # 这里是平均值数组
         scale_ = cut_params_rescale[1]  # 这里是标准差数组
         for feature_idx in range(generated_data.shape[-1]):
