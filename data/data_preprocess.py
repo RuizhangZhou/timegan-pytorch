@@ -140,7 +140,13 @@ def data_preprocess(
 
         # Pad data to `max_seq_len`
         if curr_no >= max_seq_len:
-            output[i, :, :] = curr_data[:max_seq_len, 1:]  # Shape: [1, max_seq_len, dim]
+            # 截取最前面的max_seq_len长度
+            # output[i, :, :] = curr_data[:max_seq_len, 1:]  # Shape: [1, max_seq_len, dim]
+            # time.append(max_seq_len)
+            
+            # 从随机选择的起始点开始，截取长度为 max_seq_len 的数据片段
+            start_idx = np.random.randint(0, curr_no - max_seq_len + 1)
+            output[i, :, :] = curr_data[start_idx:start_idx + max_seq_len, 1:]
             time.append(max_seq_len)
         else:
             output[i, :curr_no, :] = curr_data[:, 1:]  # Shape: [1, max_seq_len, dim]
