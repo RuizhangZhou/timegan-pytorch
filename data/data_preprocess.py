@@ -32,7 +32,7 @@ from sklearn.preprocessing import StandardScaler, MinMaxScaler
 def data_preprocess(
     file_name: str, 
     max_seq_len: int, 
-    padding_value: float=-10.0,
+    padding_value: float=0,
     impute_method: str="mode", 
     scaling_method: str="minmax", 
 ) -> Tuple[np.ndarray, np.ndarray, List]:
@@ -66,6 +66,11 @@ def data_preprocess(
     # Load csv
     print("Loading data...\n")
     ori_data = pd.read_csv(file_name)
+    
+    # 定义一个极端的填充值
+    extreme_value = -300
+    # 替换所有为0的值
+    ori_data[ori_data == 0] = extreme_value
 
     # Remove spurious column, so that column 0 is now 'admissionid'.
     if ori_data.columns[0] == "Unnamed: 0":  

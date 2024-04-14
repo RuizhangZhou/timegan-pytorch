@@ -80,8 +80,7 @@ def main(args):
     # Load and preprocess data for model
     #########################
 
-    #data_path = "/DATA1/rzhou/ika/singe_cases/inD_single_18-29.csv"
-    data_path = "/DATA1/rzhou/ika/single_testcases/inD_single_18-29_car.csv"
+    data_path = "/DATA1/rzhou/ika/multi_testcases/rounD/ori/nopad/rounD_multi_09-23_interval250_numfea10_nopad.csv"
     X, T, params_rescale, args.max_seq_len, args.padding_value = data_preprocess(
         file_name=data_path, max_seq_len=args.max_seq_len,scaling_method=args.scaling_method
     )
