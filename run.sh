@@ -3,14 +3,14 @@ train=true
 export TZ="GMT-8"
 
 # Experiment variables
-exp="rounD_multi_09-23_interval250_numfea10_Epoch10000_withoutZfilter_min_G_Loss"
+exp="rounD_multi_09-23_interval250_numfea10_Epoch10_test"
 
 # Iteration variables
-emb_epochs=10000
-sup_epochs=10000
-gan_epochs=10000
+emb_epochs=10
+sup_epochs=10
+gan_epochs=10
 
-CUDA_VISIBLE_DEVICES=3,2,1,0 nohup python main.py \
+CUDA_VISIBLE_DEVICES=2,1,0 nohup python main.py \
 --device            cuda \
 --exp               $exp \
 --is_train          $train \
@@ -28,4 +28,4 @@ CUDA_VISIBLE_DEVICES=3,2,1,0 nohup python main.py \
 --dis_thresh        0.15 \
 --optimizer         adam \
 --learning_rate     1e-3 \
->> /home/rzhou/Projects/timegan-pytorch/log/rounD_multi_09-23_interval250_numfea10_Epoch10000_withoutZfilter_min_G_Loss.log 2>&1 &
+>> /home/rzhou/Projects/timegan-pytorch/log/rounD_multi_09-23_interval250_numfea10_Epoch10_test.log 2>&1 &

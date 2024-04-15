@@ -250,7 +250,7 @@ if __name__ == "__main__":
     # Data Arguments
     parser.add_argument(
         '--max_seq_len',
-        default=100,
+        default=250,
         type=int)
     parser.add_argument(
         '--train_rate',
