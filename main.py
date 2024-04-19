@@ -80,7 +80,7 @@ def main(args):
     # Load and preprocess data for model
     #########################
 
-    data_path = "/DATA1/rzhou/ika/multi_testcases/rounD/ori/nopad/rounD_multi_09-23_interval250_numfea10_nopad.csv"
+    data_path = "/DATA1/rzhou/ika/single_testcases/rounD/rounD_single_09-23_seq250.csv"
     X, T, params_rescale, args.max_seq_len, args.padding_value = data_preprocess(
         file_name=data_path, max_seq_len=args.max_seq_len,scaling_method=args.scaling_method
     )
@@ -110,6 +110,10 @@ def main(args):
     start = time.time()
 
     model = TimeGAN(args)
+    #要改,是否从某个checkpoint继续训练
+    # model_path = "/home/rzhou/Projects/timegan-pytorch/output/rounD_multi_09-23_seq250_numfea10_Epoch5000/min_G_loss_model_epoch_5000.pt"
+    # model.load_state_dict(torch.load(model_path))
+    
     if args.is_train == True:
         timegan_trainer(model, train_data, train_time, args)
     generated_data = timegan_generator(model, train_time, args)

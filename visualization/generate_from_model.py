@@ -1,3 +1,14 @@
+import pickle
+import torch
+import os
+import sys
+
+sys.path.append('../')
+
+from models.timegan import TimeGAN
+from models.utils import rescale
+from data.data_preprocess import data_preprocess
+
 import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
@@ -6,16 +17,38 @@ from matplotlib.animation import FuncAnimation
 import matplotlib.animation as animation
 import random
 from PIL import Image
-import os
-import pickle
 
-# 以二进制读取模式打开 pickle 文件
-with open("/home/rzhou/Projects/timegan-pytorch/output/rounD_09-23_seq250_nfea10_Epoch5000+/rescaled_fake_data.pickle", "rb") as file:
-    fake_data = pickle.load(file)
-epoch=10000#要改
+
+path="/home/rzhou/Projects/timegan-pytorch/output/rounD_multi_09-23_seq250_numfea2_Epoch5000"
+with open(f"{path}/args.pickle", "rb") as fb:
+    args = torch.load(fb)
+with open(f"{path}/fake_time.pickle", "rb") as fb:
+    fake_time = pickle.load(fb)
+
+fake_time = torch.tensor(fake_time, dtype=torch.float32)
+
+data_path="/DATA1/rzhou/ika/single_testcases/rounD/rounD_single_09-23_min_seq250.csv"
+
+X, T, params_rescale, args.max_seq_len, args.padding_value = data_preprocess(
+    file_name=data_path, max_seq_len=args.max_seq_len,scaling_method=args.scaling_method
+)
+
+epoch=4000#要改
+model = TimeGAN(args)
+model_path = "/home/rzhou/Projects/timegan-pytorch/output/rounD_multi_09-23_seq250_numfea2_Epoch5000/min_G_loss_model_epoch_4000.pt"
+model.load_state_dict(torch.load(model_path))
+model.to(args.device)
+model.eval()
+with torch.no_grad():
+    # Generate fake data
+    Z = torch.rand((len(fake_time), args.max_seq_len, args.Z_dim))
+    generated_data = model(X=None, T=fake_time, Z=Z, obj="inference").numpy()
+
+fake_data=rescale(generated_data,args.scaling_method,params_rescale)
+
+
 seq_length=250#要改
-num_feature=10#要改
-#fake_data=scaler.inverse_transform(fake_data_norm.reshape(-1, num_feature)).reshape(-1, seq_length, num_feature)
+num_feature=2#要改
 
 fake_data[fake_data < -200] = 0
 
@@ -79,12 +112,12 @@ for random_index in random_indices:
 
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=25, metadata=dict(artist='Me'), bitrate=1800)
-    animPath = f'/home/rzhou/Projects/timegan-pytorch/output/rounD_09-23_seq250_nfea10_Epoch5000+/animations/{epoch}/{random_index}.mp4'
+    animPath = f'/home/rzhou/Projects/timegan-pytorch/output/rounD_multi_09-23_seq250_numfea2_Epoch5000/animations/{epoch}/{random_index}.mp4'
     checkDir(os.path.dirname(animPath))
     anim.save(animPath, writer=writer)
     
     # Save the trajectory image
-    pltPath=f'/home/rzhou/Projects/timegan-pytorch/output/rounD_09-23_seq250_nfea10_Epoch5000+/fig/{epoch}/{random_index}_trajectory.png'
+    pltPath=f'/home/rzhou/Projects/timegan-pytorch/output/rounD_multi_09-23_seq250_numfea2_Epoch5000/fig/{epoch}/{random_index}_trajectory.png'
     checkDir(os.path.dirname(pltPath))
     plt.savefig(pltPath)
     plt.close(fig)  # 关闭当前绘图窗口，防止过多图形打开

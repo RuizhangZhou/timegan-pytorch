@@ -69,7 +69,7 @@ def feature_prediction(train_data, test_data, index):
     args["n_layers"] = 3
     args["dropout"] = 0.5
     args["padding_value"] = -1.0
-    args["max_seq_len"] = 250
+    args["max_seq_len"] = seq_len
     args["learning_rate"] = 1e-3
     args["grad_clip_norm"] = 5.0
 
@@ -179,7 +179,7 @@ def one_step_ahead_prediction(train_data, test_data):
     args["n_layers"] = 3
     args["dropout"] = 0.5
     args["padding_value"] = -1.0
-    args["max_seq_len"] = 250 - 1   # only 99 is used for prediction
+    args["max_seq_len"] = seq_len - 1   # only 99 is used for prediction
     args["learning_rate"] = 1e-3
     args["grad_clip_norm"] = 5.0
 
